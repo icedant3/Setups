@@ -1,1 +1,72 @@
+# Import the repository and install the pure-ftpd package
+rpm -Uvh https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-12.noarch.rpm &&\
+yum install -y pure-ftpd
+ 
+# Edit the configuration file
+# Make sure you have this options:
+vim /etc/pure-ftpd/pure-ftpd.conf
+ 
+    # If you want simple Unix (/etc/passwd) authentication, uncomment this
+    UnixAuthentication            yes
+ 
+    ChrootEveryone yes
+    NoAnonymous yes
+ 
+    # PureDB user database (see README.Virtual-Users)
+    PureDB /etc/pure-ftpd/pureftpd.pdb
+ 
+    # Automatically create home directories if they are missing
+    CreateHomeDir yes
+ 
+touch /etc/pure-ftpd/pureftpd.passwd &&\
+ 
+# Finally, save Pure-FTPD user database.
+pure-pw mkdb
+ 
+# Add the user
+pure-pw useradd okeyimobil -u 1001 -g 1001 -d /opt/okeyimobil-transfer
+ 
+# Restart the pure-ftpd server
+systemctl stop pure-ftpd &&\
+systemctl start pure-ftpd
+ 
+# Enable The Pure-FTPd Service On Boot In Linux
+chkconfig pure-ftpd on
+ 
+# Optional
+# Stop the firewall
+systemctl stop firewalld
+ 
+# or allow the 21st port in any way, be it firewalld, iptables, firewall-cmd
+ 
+# Mega optionals
+ 
+# To change the password
+pure-pw passwd okeyimobil
+# enter the password
+ 
+# run
+pure-pw mkdb
+ 
+# show quotas
+pure-pw show
+ 
+# add quotas Here -n 1000 is the max numbers of files and -N 10 the quota (10M in this case)
+pure-pw usermod ddd -n 1000 -N 10
+
+
+#In case of errors like "FileZilla >> pureftpd 550 Could not change perms on import: Operation not permitted"
+# Clientul conectat in FileZilla nu poate edita careva fisiere si/sau permisiuni la unele directorii primind urmatoarea eroare:
+ 
+pureftpd 550 Could not change perms on import: Operation not permitted
+ 
+ 
+# Editam fisierul **/etc/pure-ftpd/pure-ftpd.conf** 
+ 
+NoChmod                     no
+ 
+# Salvam modificarile in baza de date
+ 
+pure-pw mkdb
+
 
